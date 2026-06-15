@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
+import brokenHeart from './assets/heart-broken.gif';
+import patchedHeart from './assets/heart-patched.gif';
 
 // Lightweight loader that injects canvas-confetti from CDN and triggers bursts
 function loadAndRunConfetti() {
@@ -28,7 +30,7 @@ function loadAndRunConfetti() {
 export default function App() {
   const [heartPatched, setHeartPatched] = useState(false);
   const [message, setMessage] = useState('');
-  const [notTalkPos, setNotTalkPos] = useState({ top: '50%', left: '60%' });
+  const [notTalkPos, setNotTalkPos] = useState({ top: '55%', left: '60%' });
   const [willTalkPos, setWillTalkPos] = useState(null);
   const [notTalkMoving, setNotTalkMoving] = useState(false);
   const [fireworks, setFireworks] = useState(false);
@@ -36,6 +38,7 @@ export default function App() {
   const intervalRef = useRef(null);
   const notTalkPosRef = useRef(notTalkPos);
 
+  // keep a mutable ref to the latest notTalkPos so interval callbacks can read it
   useEffect(() => {
     notTalkPosRef.current = notTalkPos;
   }, [notTalkPos]);
@@ -65,9 +68,9 @@ export default function App() {
 
   const randomPos = () => {
     const container = containerRef.current;
-    if (!container) return { top: '50%', left: '60%' };
+    if (!container) return { top: '55%', left: '60%' };
     const rect = container.getBoundingClientRect();
-    const padding = 40; // keep buttons inside
+    const padding = 36; // keep buttons inside
     const top = Math.random() * (rect.height - padding * 2) + padding;
     const left = Math.random() * (rect.width - padding * 2) + padding;
     return { top: `${top}px`, left: `${left}px` };
@@ -83,15 +86,19 @@ export default function App() {
   };
 
   const handleNotTalkClick = () => {
+    if (notTalkMoving) return;
+
     setNotTalkMoving(true);
     if (intervalRef.current) clearInterval(intervalRef.current);
-    // faster jumps: when moving, Will-talk follows the previous position
+
+    // start fast hide-and-move cycles; each cycle sets Will-talk to previous place
     intervalRef.current = setInterval(() => {
       const prev = notTalkPosRef.current;
       const next = randomPos();
       setWillTalkPos(prev);
       setNotTalkPos(next);
     }, 350);
+
     // stop after a limited number of jumps
     setTimeout(() => {
       if (intervalRef.current) {
@@ -127,13 +134,17 @@ export default function App() {
 
       {/* Background animated big heart (broken / patched) */}
       <div className={`bg-heart ${heartPatched ? 'patched' : 'broken'}`}>
-        <div className="heart-wrap" />
+        <div
+          className="heart-wrap"
+          style={{ backgroundImage: `url(${heartPatched ? patchedHeart : brokenHeart})` }}
+        />
       </div>
 
       <div className="content" ref={containerRef}>
         <h1 className="title">Ammu, will you not talk to me from now?</h1>
 
         <div className="buttons-area">
+          {/* Will-talk: if willTalkPos is set, render at that exact spot; otherwise uses CSS default */}
           <button
             className="btn will-talk"
             onClick={handleWillTalk}
@@ -144,7 +155,7 @@ export default function App() {
 
           <button
             className={`btn not-talk ${notTalkMoving ? 'moving' : ''}`}
-            style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left }}
+            style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left, transform: 'translate(-50%, -50%)' }}
             onMouseEnter={handleNotTalkEnter}
             onPointerEnter={handleNotTalkEnter}
             onTouchStart={handleNotTalkEnter}
