@@ -6,7 +6,6 @@ function loadAndRunConfetti() {
   if (typeof window === 'undefined') return;
   if (window.__confettiLoaded) {
     if (window.confetti) {
-      // two layered bursts for a nicer effect
       window.confetti({ particleCount: 160, spread: 80, origin: { y: 0.35 } });
       window.confetti({ particleCount: 120, spread: 120, origin: { y: 0.6 } });
     }
@@ -30,9 +29,11 @@ export default function App() {
   const [message, setMessage] = useState('');
   const [notTalkPos, setNotTalkPos] = useState({ top: '55%', left: '60%' });
   const [notTalkMoving, setNotTalkMoving] = useState(false);
+  const [notTalkHidden, setNotTalkHidden] = useState(false);
   const [fireworks, setFireworks] = useState(false);
   const containerRef = useRef(null);
   const intervalRef = useRef(null);
+  const timeoutsRef = useRef([]);
 
   useEffect(() => {
     // place a few floating small hearts for visual richness
@@ -51,9 +52,13 @@ export default function App() {
       container.appendChild(el);
       nodes.push(el);
     }
+
     return () => {
       nodes.forEach(n => n.remove());
       if (intervalRef.current) clearInterval(intervalRef.current);
+      // clear timeouts
+      timeoutsRef.current.forEach(t => clearTimeout(t));
+      timeoutsRef.current = [];
     };
   }, []);
 
@@ -70,30 +75,50 @@ export default function App() {
   const handleNotTalkEnter = () => {
     // quick dodge on hover / pointer enter / touch
     if (notTalkMoving) return;
-    // jump twice rapidly to make it feel faster
-    setNotTalkPos(randomPos());
-    setTimeout(() => setNotTalkPos(randomPos()), 120);
+    // small smooth dodge: hide briefly then show at new pos
+    setNotTalkHidden(true);
+    const t1 = setTimeout(() => {
+      setNotTalkPos(randomPos());
+      setNotTalkHidden(false);
+    }, 140);
+    timeoutsRef.current.push(t1);
   };
 
   const handleNotTalkClick = () => {
-    // continuous faster jumping for a short burst
+    // Hide-and-seek style jumping: smooth hide, relocate, reveal repeatedly
+    if (notTalkMoving) return; // already running
     setNotTalkMoving(true);
-    // immediate move
-    setNotTalkPos(randomPos());
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    // faster interval (200ms) for rapid jumps
-    intervalRef.current = setInterval(() => {
-      setNotTalkPos(randomPos());
-    }, 200);
 
-    // stop after a limited number of jumps (12 jumps -> ~2.4s)
-    setTimeout(() => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+    const cycles = 10; // number of hide-seek cycles
+    const hideDuration = 140; // ms hidden
+    const gap = 180; // ms between reveals (controls smoothness)
+
+    let i = 0;
+
+    const runCycle = () => {
+      if (i >= cycles) {
+        setNotTalkMoving(false);
+        setNotTalkHidden(false);
+        return;
       }
-      setNotTalkMoving(false);
-    }, 200 * 12);
+
+      // hide
+      setNotTalkHidden(true);
+      const tHide = setTimeout(() => {
+        // move while hidden
+        setNotTalkPos(randomPos());
+        // reveal
+        setNotTalkHidden(false);
+        i += 1;
+        // schedule next cycle
+        const tNext = setTimeout(runCycle, gap);
+        timeoutsRef.current.push(tNext);
+      }, hideDuration);
+
+      timeoutsRef.current.push(tHide);
+    };
+
+    runCycle();
   };
 
   const handleWillTalk = () => {
@@ -105,7 +130,8 @@ export default function App() {
     loadAndRunConfetti();
 
     // stop CSS fireworks after 3s
-    setTimeout(() => setFireworks(false), 3000);
+    const t = setTimeout(() => setFireworks(false), 3000);
+    timeoutsRef.current.push(t);
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -133,7 +159,7 @@ export default function App() {
           </button>
 
           <button
-            className={`btn not-talk ${notTalkMoving ? 'moving' : ''}`}
+            className={`btn not-talk ${notTalkMoving ? 'moving' : ''} ${notTalkHidden ? 'hidden' : ''}`}
             style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left }}
             onMouseEnter={handleNotTalkEnter}
             onPointerEnter={handleNotTalkEnter}
