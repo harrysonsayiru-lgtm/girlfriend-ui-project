@@ -1,106 +1,21 @@
-@root{
-  --bg-1:#fff3f6;
-  --bg-2:#fff7fb;
-  --accent-1:#ff416c; /* pink */
-  --accent-2:#ffaf7b; /* orange */
-  --muted:#f7f7f8;
-}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,80,140,0.6)}70%{box-shadow:0 0 0 18px rgba(255,80,140,0)}100%{box-shadow:0 0 0 0 rgba(255,80,140,0)}}
 
-*{box-sizing:border-box}
-body,html,#root{height:100%;margin:0}
-
-.app-root{
-  position:relative;
-  min-height:100vh;
-  overflow:hidden;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(255, 230, 240,0.9), transparent 20%), linear-gradient(180deg,var(--bg-1),var(--bg-2));
-  display:flex;align-items:center;justify-content:center;padding:24px;
-}
-
-/* Floating decorative hearts (small) */
-.heart-particles{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.heart-particles span{position:absolute;width:28px;height:28px;opacity:0.9;transform-origin:center;filter:drop-shadow(0 8px 18px rgba(0,0,0,0.12));}
-.heart-particles span::before{content:'\2764';display:block;font-size:26px;line-height:28px;color:rgba(255,70,130,0.95);text-shadow:0 1px 0 rgba(255,255,255,0.25)}
-
-@keyframes floatUp{0%{transform:translateY(0) scale(0.9);opacity:0}20%{opacity:1}100%{transform:translateY(-420px) scale(1.05);opacity:0}}
-
-/* Big center heart using local GIFs in src/assets */
-.bg-heart{
-  position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;pointer-events:none;
-}
-.bg-heart .heart-wrap{width:78vmin;max-width:1100px;max-height:1100px;height:78vmin;opacity:0.9;filter:drop-shadow(0 40px 80px rgba(255,80,120,0.12));transform-origin:center;animation:heartFloat 6s ease-in-out infinite;background-repeat:no-repeat;background-position:center;background-size:contain}
-
-@keyframes heartFloat{0%{transform:translateY(-10px) rotate(-1deg)}50%{transform:translateY(10px) rotate(1deg)}100%{transform:translateY(-10px) rotate(-1deg)}}
-
-/* Use committed GIFs from src/assets (webpack-resolvable) */
-.bg-heart.broken .heart-wrap{
-  background-image: url('./assets/heart-broken.gif');
-}
-.bg-heart.patched .heart-wrap{
-  background-image: url('./assets/heart-patched.gif');
-}
-
-/* Main content */
-.content{position:relative;z-index:10;width:100%;max-width:980px;padding:28px 10px;color:#111}
-.title{font-weight:700;font-size:clamp(28px,7.5vw,74px);line-height:0.95;margin:2vh 0 18px;color:#071133;text-shadow:0 6px 30px rgba(255,90,120,0.06)}
-.sub{color:#6b6b7a;margin-top:8px;font-size:1.05rem}
-
-/* Buttons zone */
-.buttons-area{position:relative;height:320px;margin-top:18px}
-
-/* Buttons */
-.btn{border-radius:999px;padding:16px 30px;border:none;font-weight:700;font-size:1.05rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
-
-.btn.will-talk{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;box-shadow:0 18px 40px rgba(255,80,140,0.18), inset 0 -2px 0 rgba(255,255,255,0.08);transform:translateZ(0);transition:transform 220ms cubic-bezier(.2,.9,.3,1),box-shadow 220ms}
-.btn.will-talk:active{transform:scale(.98)}
-.btn.will-talk:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 28px 60px rgba(255,80,140,0.2)}
-
-/* Place will-talk lower and center inside the card */
+/* Ensure Will-talk is clearly visible above other layers */
 .btn.will-talk{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:5.5rem;
-  z-index:15;
-}
-@media (max-width:640px){
-  .btn.will-talk{ bottom:4rem; padding:14px 26px; font-size:1rem; }
+  z-index:9999 !important;
+  color:#fff !important;
+  background:linear-gradient(90deg,var(--accent-1),var(--accent-2)) !important;
+  padding:14px 26px !important;
+  box-shadow:0 22px 48px rgba(255,80,140,0.18) !important;
+  border-radius:999px !important;
 }
 
-/* Not talk - playful */
-.btn.not-talk{background:white;color:#333;border:2px solid rgba(0,0,0,0.06);width:140px;height:52px;box-shadow:0 8px 20px rgba(16,24,40,0.06); transition: top 160ms ease, left 160ms ease, opacity 140ms ease, transform 140ms ease; will-change: top, left, opacity, transform}
-.btn.not-talk:hover{filter:brightness(1.02)}
-.btn.not-talk.hidden{opacity:0;transform:scale(0.6);pointer-events:none}
-.btn.not-talk.moving{animation:wiggle 300ms infinite}
-@keyframes wiggle{0%{transform:rotate(0deg)}25%{transform:rotate(3deg)}75%{transform:rotate(-3deg)}100%{transform:rotate(0deg)}}
+.btn.will-talk.highlight{animation:pulse 700ms ease-out}
 
-/* message styles */
-.message{margin-top:28px;font-size:1.25rem;color:#ff3d6e;font-weight:700}
-
-/* Fireworks / confetti area - CSS particles */
-.fireworks{position:absolute;z-index:30;left:50%;top:28%;transform:translateX(-50%);width:640px;height:420px;pointer-events:none;overflow:visible}
-.fireworks .spark{position:absolute;width:10px;height:10px;border-radius:50%;opacity:0;transform-origin:center;background:linear-gradient(90deg,#ffd166,#ff6b6b);animation:burst 1000ms ease-out forwards}
-.fireworks .spark:nth-child(1){left:50%;top:50%;animation-delay:0ms;transform:translate(-50%,-50%)}
-.fireworks .spark:nth-child(2){left:50%;top:50%;animation-delay:60ms}
-.fireworks .spark:nth-child(3){left:50%;top:50%;animation-delay:130ms}
-.fireworks .spark:nth-child(4){left:50%;top:50%;animation-delay:200ms}
-.fireworks .spark:nth-child(5){left:50%;top:50%;animation-delay:260ms}
-.fireworks .spark:nth-child(6){left:50%;top:50%;animation-delay:320ms}
-.fireworks .spark:nth-child(7){left:50%;top:50%;animation-delay:380ms}
-.fireworks .spark:nth-child(8){left:50%;top:50%;animation-delay:420ms}
-.fireworks .spark:nth-child(9){left:50%;top:50%;animation-delay:480ms}
-.fireworks .spark:nth-child(10){left:50%;top:50%;animation-delay:540ms}
-.fireworks .spark:nth-child(11){left:50%;top:50%;animation-delay:600ms}
-.fireworks .spark:nth-child(12){left:50%;top:50%;animation-delay:660ms}
-
-@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(calc(var(--dx)),calc(var(--dy))) scale(0.4)}}
-
-/* responsive */
-@media (max-width:640px){
-  .fireworks{width:320px;height:240px;top:30%}
-  .content{padding:18px}
-  .buttons-area{height:220px}
-  .bg-heart .heart-wrap{width:92vmin;height:92vmin}
-  .title{font-size:clamp(20px,10vw,46px)}
+/* Make heart-wrap fully visible and ensure its background is rendered */
+.bg-heart .heart-wrap{
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:contain !important;
+  opacity:1 !important;
 }
