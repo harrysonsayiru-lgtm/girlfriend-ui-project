@@ -3,7 +3,7 @@
 /* Ensure Will-talk is clearly visible above other layers */
 .btn.will-talk{
   z-index:9999 !important;
-  color:#fff !important;
+  color:#000 !important;
   background:linear-gradient(90deg,var(--accent-1),var(--accent-2)) !important;
   padding:14px 26px !important;
   box-shadow:0 22px 48px rgba(255,80,140,0.18) !important;
