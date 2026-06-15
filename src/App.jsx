@@ -32,11 +32,13 @@ export default function App() {
   const [message, setMessage] = useState('');
   const [notTalkPos, setNotTalkPos] = useState({ top: '55%', left: '60%' });
   const [willTalkPos, setWillTalkPos] = useState(null);
+  const [willTalkHighlight, setWillTalkHighlight] = useState(false);
   const [notTalkMoving, setNotTalkMoving] = useState(false);
   const [fireworks, setFireworks] = useState(false);
   const containerRef = useRef(null);
   const intervalRef = useRef(null);
   const notTalkPosRef = useRef(notTalkPos);
+  const highlightTimeoutRef = useRef(null);
 
   // keep a mutable ref to the latest notTalkPos so interval callbacks can read it
   useEffect(() => {
@@ -63,6 +65,7 @@ export default function App() {
     return () => {
       nodes.forEach(n => n.remove());
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
     };
   }, []);
 
@@ -76,12 +79,20 @@ export default function App() {
     return { top: `${top}px`, left: `${left}px` };
   };
 
+  const showWillTalkAt = (pos) => {
+    // set highlight and clear after 700ms
+    setWillTalkPos(pos);
+    setWillTalkHighlight(true);
+    if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
+    highlightTimeoutRef.current = setTimeout(() => setWillTalkHighlight(false), 700);
+  };
+
   const handleNotTalkEnter = () => {
     if (notTalkMoving) return;
     // move Not-talk and place Will-talk where Not-talk was
     const prev = notTalkPosRef.current;
     const next = randomPos();
-    setWillTalkPos(prev);
+    showWillTalkAt(prev);
     setNotTalkPos(next);
   };
 
@@ -95,7 +106,7 @@ export default function App() {
     intervalRef.current = setInterval(() => {
       const prev = notTalkPosRef.current;
       const next = randomPos();
-      setWillTalkPos(prev);
+      showWillTalkAt(prev);
       setNotTalkPos(next);
     }, 350);
 
@@ -146,9 +157,9 @@ export default function App() {
         <div className="buttons-area">
           {/* Will-talk: if willTalkPos is set, render at that exact spot; otherwise uses CSS default */}
           <button
-            className="btn will-talk"
+            className={`btn will-talk ${willTalkHighlight ? 'highlight' : ''}`}
             onClick={handleWillTalk}
-            style={willTalkPos ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)' } : undefined}
+            style={willTalkPos ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)', zIndex: 999 } : undefined}
           >
             Will talk
           </button>
