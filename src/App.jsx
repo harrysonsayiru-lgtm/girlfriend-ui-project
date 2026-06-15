@@ -1,84 +1,106 @@
-import React, { useState } from 'react';
-import { FiHeart } from 'react-icons/fi';
-import { AiFillHeart } from 'react-icons/ai';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 export default function App() {
-  const [responded, setResponded] = useState(false);
-  const [noClicked, setNoClicked] = useState(false);
-  const [yesPosition, setYesPosition] = useState({ x: 0, y: 0 });
+  const [heartPatched, setHeartPatched] = useState(false);
+  const [message, setMessage] = useState('');
+  const [notTalkPos, setNotTalkPos] = useState({ top: '50%', left: '60%' });
+  const [notTalkMoving, setNotTalkMoving] = useState(false);
+  const [fireworks, setFireworks] = useState(false);
+  const containerRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  const handleNoClick = () => {
-    setNoClicked(true);
-    setResponded(true);
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const randomPos = () => {
+    const container = containerRef.current;
+    if (!container) return { top: '50%', left: '60%' };
+    const rect = container.getBoundingClientRect();
+    const padding = 40; // keep buttons inside
+    const top = Math.random() * (rect.height - padding * 2) + padding;
+    const left = Math.random() * (rect.width - padding * 2) + padding;
+    return { top: `${top}px`, left: `${left}px` };
   };
 
-  const handleYesHover = () => {
-    const newX = Math.random() * 300 - 150;
-    const newY = Math.random() * 300 - 150;
-    setYesPosition({ x: newX, y: newY });
+  const handleNotTalkEnter = () => {
+    // move on hover
+    if (notTalkMoving) return;
+    setNotTalkPos(randomPos());
+  };
+
+  const handleNotTalkClick = () => {
+    // start continuous jumping
+    setNotTalkMoving(true);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setNotTalkPos(randomPos());
+    }, 700);
+    // stop after 8 jumps to avoid runaway
+    setTimeout(() => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      setNotTalkMoving(false);
+    }, 700 * 8);
+  };
+
+  const handleWillTalk = () => {
+    // only this should be clickable to accept
+    setHeartPatched(true);
+    setMessage("Thank you! I'll talk to you 💖");
+    setFireworks(true);
+    // stop fireworks after a while
+    setTimeout(() => setFireworks(false), 3000);
+    // also stop notTalk movement if running
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setNotTalkMoving(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-red-100 to-pink-300 flex items-center justify-center overflow-hidden">
-      
-      {/* Background Heart - Broken or Healed */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-        {noClicked ? (
-          <div className="text-9xl animate-bounce">💚</div>
-        ) : (
-          <div className="text-9xl animate-pulse">💔</div>
-        )}
-      </div>
+    <div className="app-root">
+      {/* Background animated big heart (acts like a GIF) */}
+      <div className={`bg-heart ${heartPatched ? 'patched' : 'broken'}`} />
 
-      {/* Main Content */}
-      <div className="relative z-10 text-center px-6">
-        
-        {/* Main Question */}
-        <h1 className="text-6xl font-bold text-red-600 mb-8 animate-fade-in">
-          Ammu, will you not talk to me from now? 😢
-        </h1>
+      <div className="content" ref={containerRef}>
+        <h1 className="title">Ammu, will you not talk to me from now?</h1>
 
-        {/* Message after response */}
-        {responded && noClicked && (
-          <div className="text-4xl font-bold text-green-600 mb-8 animate-bounce">
-            I'll talk, Ronaldo! 💚✨
-          </div>
-        )}
-
-        {/* Buttons Container */}
-        <div className="flex gap-8 justify-center items-center relative h-24">
-          
-          {/* YES Button - Always Escaping */}
+        <div className="buttons-area">
           <button
-            onMouseEnter={handleYesHover}
-            className="relative px-8 py-4 text-2xl font-bold text-white bg-red-500 rounded-full cursor-not-allowed opacity-75 hover:opacity-75 transition-all duration-100"
-            style={{
-              transform: `translate(${yesPosition.x}px, ${yesPosition.y}px)`,
-              pointerEvents: responded ? 'none' : 'auto'
-            }}
-            disabled
+            className="btn will-talk"
+            onClick={handleWillTalk}
           >
-            [Yes 💔]
+            Will talk
           </button>
 
-          {/* NO Button - Clickable */}
           <button
-            onClick={handleNoClick}
-            className={`px-8 py-4 text-2xl font-bold text-white rounded-full transition-all duration-300 ${
-              noClicked
-                ? 'bg-green-500 hover:bg-green-600'
-                : 'bg-blue-500 hover:bg-blue-600 hover:scale-110'
-            }`}
+            className={`btn not-talk ${notTalkMoving ? 'moving' : ''}`}
+            style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left }}
+            onMouseEnter={handleNotTalkEnter}
+            onClick={handleNotTalkClick}
           >
-            No {noClicked ? '💚' : '💔'}
+            Not talk
           </button>
         </div>
 
-        {/* Footer Message */}
-        {noClicked && (
-          <div className="mt-12 text-2xl text-red-600 font-semibold animate-fade-in">
-            You're the best! 🥰❤️
+        {/* Message area */}
+        {message && (
+          <div className="message">{message}</div>
+        )}
+
+        {/* Fireworks */}
+        {fireworks && (
+          <div className="fireworks" aria-hidden>
+            {Array.from({ length: 12 }).map((_, i) => (
+              <span key={i} className={`spark spark-${i}`} />
+            ))}
           </div>
         )}
       </div>
