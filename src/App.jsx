@@ -28,7 +28,7 @@ function loadAndRunConfetti() {
 export default function App() {
   const [heartPatched, setHeartPatched] = useState(false);
   const [message, setMessage] = useState('');
-  const [notTalkPos, setNotTalkPos] = useState({ top: '50%', left: '60%' });
+  const [notTalkPos, setNotTalkPos] = useState({ top: '55%', left: '60%' });
   const [notTalkMoving, setNotTalkMoving] = useState(false);
   const [fireworks, setFireworks] = useState(false);
   const containerRef = useRef(null);
@@ -59,33 +59,41 @@ export default function App() {
 
   const randomPos = () => {
     const container = containerRef.current;
-    if (!container) return { top: '50%', left: '60%' };
+    if (!container) return { top: '55%', left: '60%' };
     const rect = container.getBoundingClientRect();
-    const padding = 40; // keep buttons inside
+    const padding = 36; // keep buttons inside
     const top = Math.random() * (rect.height - padding * 2) + padding;
     const left = Math.random() * (rect.width - padding * 2) + padding;
     return { top: `${top}px`, left: `${left}px` };
   };
 
   const handleNotTalkEnter = () => {
+    // quick dodge on hover / pointer enter / touch
     if (notTalkMoving) return;
+    // jump twice rapidly to make it feel faster
     setNotTalkPos(randomPos());
+    setTimeout(() => setNotTalkPos(randomPos()), 120);
   };
 
   const handleNotTalkClick = () => {
+    // continuous faster jumping for a short burst
     setNotTalkMoving(true);
+    // immediate move
+    setNotTalkPos(randomPos());
     if (intervalRef.current) clearInterval(intervalRef.current);
+    // faster interval (200ms) for rapid jumps
     intervalRef.current = setInterval(() => {
       setNotTalkPos(randomPos());
-    }, 700);
-    // stop after a limited number of jumps
+    }, 200);
+
+    // stop after a limited number of jumps (12 jumps -> ~2.4s)
     setTimeout(() => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
       setNotTalkMoving(false);
-    }, 700 * 9);
+    }, 200 * 12);
   };
 
   const handleWillTalk = () => {
@@ -128,6 +136,8 @@ export default function App() {
             className={`btn not-talk ${notTalkMoving ? 'moving' : ''}`}
             style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left }}
             onMouseEnter={handleNotTalkEnter}
+            onPointerEnter={handleNotTalkEnter}
+            onTouchStart={handleNotTalkEnter}
             onClick={handleNotTalkClick}
           >
             Not talk
