@@ -40,13 +40,11 @@ export default function App() {
   const notTalkPosRef = useRef(notTalkPos);
   const highlightTimeoutRef = useRef(null);
 
-  // keep a mutable ref to the latest notTalkPos so interval callbacks can read it
   useEffect(() => {
     notTalkPosRef.current = notTalkPos;
   }, [notTalkPos]);
 
   useEffect(() => {
-    // place a few floating small hearts for visual richness
     const container = containerRef.current;
     if (!container) return;
     const particleCount = 8;
@@ -73,14 +71,13 @@ export default function App() {
     const container = containerRef.current;
     if (!container) return { top: '55%', left: '60%' };
     const rect = container.getBoundingClientRect();
-    const padding = 36; // keep buttons inside
+    const padding = 36;
     const top = Math.random() * (rect.height - padding * 2) + padding;
     const left = Math.random() * (rect.width - padding * 2) + padding;
     return { top: `${top}px`, left: `${left}px` };
   };
 
   const showWillTalkAt = (pos) => {
-    // set highlight and clear after 700ms
     setWillTalkPos(pos);
     setWillTalkHighlight(true);
     if (highlightTimeoutRef.current) clearTimeout(highlightTimeoutRef.current);
@@ -89,7 +86,6 @@ export default function App() {
 
   const handleNotTalkEnter = () => {
     if (notTalkMoving) return;
-    // move Not-talk and place Will-talk where Not-talk was
     const prev = notTalkPosRef.current;
     const next = randomPos();
     showWillTalkAt(prev);
@@ -98,19 +94,14 @@ export default function App() {
 
   const handleNotTalkClick = () => {
     if (notTalkMoving) return;
-
     setNotTalkMoving(true);
     if (intervalRef.current) clearInterval(intervalRef.current);
-
-    // start fast hide-and-move cycles; each cycle sets Will-talk to previous place
     intervalRef.current = setInterval(() => {
       const prev = notTalkPosRef.current;
       const next = randomPos();
       showWillTalkAt(prev);
       setNotTalkPos(next);
     }, 350);
-
-    // stop after a limited number of jumps
     setTimeout(() => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -124,13 +115,8 @@ export default function App() {
     setHeartPatched(true);
     setMessage("Thank you! I'll talk to you 💖");
     setFireworks(true);
-
-    // run canvas confetti for richer fireworks (loaded from CDN)
     loadAndRunConfetti();
-
-    // stop CSS fireworks after 3s
     setTimeout(() => setFireworks(false), 3000);
-
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -138,35 +124,47 @@ export default function App() {
     }
   };
 
+  const defaultWillTalkStyle = {
+    position: 'absolute',
+    left: '50%',
+    bottom: '5.5rem',
+    transform: 'translate(-50%, -50%)',
+    zIndex: 9999,
+    background: 'linear-gradient(90deg,#ff416c,#ffaf7b)',
+    color: '#fff',
+    padding: '14px 26px',
+    borderRadius: '999px',
+    boxShadow: '0 22px 48px rgba(255,80,140,0.18)'
+  };
+
+  const willTalkStyle = willTalkPos
+    ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)', zIndex: 9999, background: 'linear-gradient(90deg,#ff416c,#ffaf7b)', color: '#fff', padding: '14px 26px', borderRadius: '999px', boxShadow: '0 22px 48px rgba(255,80,140,0.18)' }
+    : defaultWillTalkStyle;
+
   return (
     <div className="app-root">
-      {/* decorative small hearts container */}
       <div className="heart-particles" aria-hidden />
-
-      {/* Background animated big heart (broken / patched) */}
       <div className={`bg-heart ${heartPatched ? 'patched' : 'broken'}`}>
-        <div
-          className="heart-wrap"
-          style={{ backgroundImage: `url(${heartPatched ? patchedHeart : brokenHeart})` }}
-        />
+        <div className="heart-wrap">
+          <img src={heartPatched ? patchedHeart : brokenHeart} alt="heart" className="heart-img" />
+        </div>
       </div>
 
       <div className="content" ref={containerRef}>
         <h1 className="title">Ammu, will you not talk to me from now?</h1>
 
         <div className="buttons-area">
-          {/* Will-talk: if willTalkPos is set, render at that exact spot; otherwise uses CSS default */}
           <button
             className={`btn will-talk ${willTalkHighlight ? 'highlight' : ''}`}
             onClick={handleWillTalk}
-            style={willTalkPos ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)', zIndex: 999 } : undefined}
+            style={willTalkStyle}
           >
             Will talk
           </button>
 
           <button
             className={`btn not-talk ${notTalkMoving ? 'moving' : ''}`}
-            style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left, transform: 'translate(-50%, -50%)' }}
+            style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left, transform: 'translate(-50%, -50%)', zIndex: 50 }}
             onMouseEnter={handleNotTalkEnter}
             onPointerEnter={handleNotTalkEnter}
             onTouchStart={handleNotTalkEnter}
