@@ -1,5 +1,57 @@
-/* src/App.css - richer UI and animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
+@keyframes move-around {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(100px, -100px);
+  }
+  50% {
+    transform: translate(-150px, 100px);
+  }
+  75% {
+    transform: translate(150px, 100px);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-move {
+  animation: move-around 0.5s ease-in-out;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Additional richer styles below (kept backwards compatible) */
 :root{
   --bg-1:#fff3f6;
   --bg-2:#fff7fb;
@@ -28,22 +80,24 @@ body,html,#root{height:100%;margin:0}
 /* create a subtle upward float using CSS vars assigned inline from JS */
 @keyframes floatUp{0%{transform:translateY(0) scale(0.9);opacity:0}20%{opacity:1}100%{transform:translateY(-420px) scale(1.05);opacity:0}}
 
-/* Big center heart using SVG data-URIs for broken/patched */
+/* Big center heart uses the GIFs you provided (hotlinked)
+   These are Giphy media URLs derived from the links you supplied.
+*/
 .bg-heart{
   position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;pointer-events:none;
 }
-.bg-heart .heart-wrap{width:78vmin;max-width:1100px;max-height:1100px;height:78vmin;opacity:0.75;filter:drop-shadow(0 40px 80px rgba(255,80,120,0.12));transform-origin:center;animation:heartFloat 6s ease-in-out infinite}
+.bg-heart .heart-wrap{width:78vmin;max-width:1100px;max-height:1100px;height:78vmin;opacity:0.85;filter:drop-shadow(0 40px 80px rgba(255,80,120,0.12));transform-origin:center;animation:heartFloat 6s ease-in-out infinite}
 
 @keyframes heartFloat{0%{transform:translateY(-10px) rotate(-1deg)}50%{transform:translateY(10px) rotate(1deg)}100%{transform:translateY(-10px) rotate(-1deg)}}
 
-/* broken heart (SVG with crack) */
+/* Use the media.giphy.com direct gif URLs (hotlinks) */
 .bg-heart.broken .heart-wrap{
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23ff6b6b'/><stop offset='1' stop-color='%23ff3d7f'/></linearGradient></defs><g transform='translate(100,100)'><path d='M0-40C-33-80-90-60-90-14C-90 18-60 48-0 90C60 48 90 18 90-14C90-60 33-80 0-40Z' fill='url(%23g)' stroke='%23c33' stroke-width='2'/><path d='M-5 -10 L20 10 L-10 30 L10 60' stroke='%23000000' stroke-width='3' stroke-linecap='round' fill='none' opacity='0.9'/></g></svg>");
-  background-repeat:no-repeat;background-position:center;background-size:contain;}
+  background-image: url('https://media.giphy.com/media/8R7Tz4shvTWdof0eM9/giphy.gif');
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+}
 
-/* patched heart (healed) */
 .bg-heart.patched .heart-wrap{
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><linearGradient id='h' x1='0' x2='1'><stop offset='0' stop-color='%23ffd166'/><stop offset='1' stop-color='%23ff6b6b'/></linearGradient></defs><g transform='translate(100,100)'><path d='M0-40C-33-80-90-60-90-14C-90 18-60 48-0 90C60 48 90 18 90-14C90-60 33-80 0-40Z' fill='url(%23h)' stroke='%23ff3d3d' stroke-width='2'/><g transform='translate(-10,0)'><rect x='-10' y='-8' width='40' height='16' rx='2' fill='%23ffffff' opacity='0.22' transform='rotate(-18)'/></g></g></svg>");
+  background-image: url('https://media.giphy.com/media/azi3GTPtxWKCQ/giphy.gif');
   background-repeat:no-repeat;background-position:center;background-size:contain;opacity:1;}
 
 /* Main content */
