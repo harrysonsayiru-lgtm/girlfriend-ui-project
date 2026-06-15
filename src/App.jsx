@@ -6,6 +6,7 @@ function loadAndRunConfetti() {
   if (typeof window === 'undefined') return;
   if (window.__confettiLoaded) {
     if (window.confetti) {
+      // two layered bursts for a nicer effect
       window.confetti({ particleCount: 160, spread: 80, origin: { y: 0.35 } });
       window.confetti({ particleCount: 120, spread: 120, origin: { y: 0.6 } });
     }
@@ -27,13 +28,17 @@ function loadAndRunConfetti() {
 export default function App() {
   const [heartPatched, setHeartPatched] = useState(false);
   const [message, setMessage] = useState('');
-  const [notTalkPos, setNotTalkPos] = useState({ top: '65%', left: '50%' });
+  const [notTalkPos, setNotTalkPos] = useState({ top: '50%', left: '60%' });
+  const [willTalkPos, setWillTalkPos] = useState(null);
   const [notTalkMoving, setNotTalkMoving] = useState(false);
-  const [notTalkHidden, setNotTalkHidden] = useState(false);
   const [fireworks, setFireworks] = useState(false);
   const containerRef = useRef(null);
   const intervalRef = useRef(null);
-  const timeoutsRef = useRef([]);
+  const notTalkPosRef = useRef(notTalkPos);
+
+  useEffect(() => {
+    notTalkPosRef.current = notTalkPos;
+  }, [notTalkPos]);
 
   useEffect(() => {
     // place a few floating small hearts for visual richness
@@ -52,73 +57,49 @@ export default function App() {
       container.appendChild(el);
       nodes.push(el);
     }
-
     return () => {
       nodes.forEach(n => n.remove());
       if (intervalRef.current) clearInterval(intervalRef.current);
-      // clear timeouts
-      timeoutsRef.current.forEach(t => clearTimeout(t));
-      timeoutsRef.current = [];
     };
   }, []);
 
   const randomPos = () => {
     const container = containerRef.current;
-    if (!container) return { top: '65%', left: '50%' };
+    if (!container) return { top: '50%', left: '60%' };
     const rect = container.getBoundingClientRect();
-    const padding = 36; // keep buttons inside
+    const padding = 40; // keep buttons inside
     const top = Math.random() * (rect.height - padding * 2) + padding;
     const left = Math.random() * (rect.width - padding * 2) + padding;
     return { top: `${top}px`, left: `${left}px` };
   };
 
   const handleNotTalkEnter = () => {
-    // quick dodge on hover / pointer enter / touch
     if (notTalkMoving) return;
-    // small smooth dodge: hide briefly then show at new pos
-    setNotTalkHidden(true);
-    const t1 = setTimeout(() => {
-      setNotTalkPos(randomPos());
-      setNotTalkHidden(false);
-    }, 140);
-    timeoutsRef.current.push(t1);
+    // move Not-talk and place Will-talk where Not-talk was
+    const prev = notTalkPosRef.current;
+    const next = randomPos();
+    setWillTalkPos(prev);
+    setNotTalkPos(next);
   };
 
   const handleNotTalkClick = () => {
-    // Hide-and-seek style jumping: smooth hide, relocate, reveal repeatedly
-    if (notTalkMoving) return; // already running
     setNotTalkMoving(true);
-
-    const cycles = 10; // number of hide-seek cycles
-    const hideDuration = 140; // ms hidden
-    const gap = 180; // ms between reveals (controls smoothness)
-
-    let i = 0;
-
-    const runCycle = () => {
-      if (i >= cycles) {
-        setNotTalkMoving(false);
-        setNotTalkHidden(false);
-        return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    // faster jumps: when moving, Will-talk follows the previous position
+    intervalRef.current = setInterval(() => {
+      const prev = notTalkPosRef.current;
+      const next = randomPos();
+      setWillTalkPos(prev);
+      setNotTalkPos(next);
+    }, 350);
+    // stop after a limited number of jumps
+    setTimeout(() => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
-
-      // hide
-      setNotTalkHidden(true);
-      const tHide = setTimeout(() => {
-        // move while hidden
-        setNotTalkPos(randomPos());
-        // reveal
-        setNotTalkHidden(false);
-        i += 1;
-        // schedule next cycle
-        const tNext = setTimeout(runCycle, gap);
-        timeoutsRef.current.push(tNext);
-      }, hideDuration);
-
-      timeoutsRef.current.push(tHide);
-    };
-
-    runCycle();
+      setNotTalkMoving(false);
+    }, 350 * 14);
   };
 
   const handleWillTalk = () => {
@@ -130,8 +111,7 @@ export default function App() {
     loadAndRunConfetti();
 
     // stop CSS fireworks after 3s
-    const t = setTimeout(() => setFireworks(false), 3000);
-    timeoutsRef.current.push(t);
+    setTimeout(() => setFireworks(false), 3000);
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -154,17 +134,16 @@ export default function App() {
         <h1 className="title">Ammu, will you not talk to me from now?</h1>
 
         <div className="buttons-area">
-          {/* Move Will talk lower on the card so it's not centered over the heart */}
           <button
             className="btn will-talk"
             onClick={handleWillTalk}
-            style={{ position: 'absolute', top: '62%', left: '35%', transform: 'translate(-50%, -50%)' }}
+            style={willTalkPos ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)' } : undefined}
           >
             Will talk
           </button>
 
           <button
-            className={`btn not-talk ${notTalkMoving ? 'moving' : ''} ${notTalkHidden ? 'hidden' : ''}`}
+            className={`btn not-talk ${notTalkMoving ? 'moving' : ''}`}
             style={{ position: 'absolute', top: notTalkPos.top, left: notTalkPos.left }}
             onMouseEnter={handleNotTalkEnter}
             onPointerEnter={handleNotTalkEnter}
