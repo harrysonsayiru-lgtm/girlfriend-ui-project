@@ -132,14 +132,14 @@ export default function App() {
     transform: 'translate(-50%, -50%)',
     zIndex: 9999,
     background: 'linear-gradient(90deg,#ff416c,#ffaf7b)',
-    color: '#fff',
+    color: '#000',
     padding: '14px 26px',
     borderRadius: '999px',
     boxShadow: '0 22px 48px rgba(255,80,140,0.18)'
   };
 
   const willTalkStyle = willTalkPos
-    ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)', zIndex: 9999, background: 'linear-gradient(90deg,#ff416c,#ffaf7b)', color: '#fff', padding: '14px 26px', borderRadius: '999px', boxShadow: '0 22px 48px rgba(255,80,140,0.18)' }
+    ? { position: 'absolute', top: willTalkPos.top, left: willTalkPos.left, transform: 'translate(-50%, -50%)', zIndex: 9999, background: 'linear-gradient(90deg,#ff416c,#ffaf7b)', color: '#000', padding: '14px 26px', borderRadius: '999px', boxShadow: '0 22px 48px rgba(255,80,140,0.18)' }
     : defaultWillTalkStyle;
 
   return (
