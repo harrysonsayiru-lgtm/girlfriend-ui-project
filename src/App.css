@@ -1,4 +1,4 @@
-:root{
+@root{
   --bg-1:#fff3f6;
   --bg-2:#fff7fb;
   --accent-1:#ff416c; /* pink */
@@ -25,7 +25,7 @@ body,html,#root{height:100%;margin:0}
 
 @keyframes floatUp{0%{transform:translateY(0) scale(0.9);opacity:0}20%{opacity:1}100%{transform:translateY(-420px) scale(1.05);opacity:0}}
 
-/* Big center heart using local GIFs in public/assets */
+/* Big center heart using local GIFs in src/assets */
 .bg-heart{
   position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;pointer-events:none;
 }
@@ -33,12 +33,12 @@ body,html,#root{height:100%;margin:0}
 
 @keyframes heartFloat{0%{transform:translateY(-10px) rotate(-1deg)}50%{transform:translateY(10px) rotate(1deg)}100%{transform:translateY(-10px) rotate(-1deg)}}
 
-/* Use committed GIFs from public/assets (served at /assets/...) */
+/* Use committed GIFs from src/assets (webpack-resolvable) */
 .bg-heart.broken .heart-wrap{
-  background-image: url('/assets/heart-broken.gif');
+  background-image: url('./assets/heart-broken.gif');
 }
 .bg-heart.patched .heart-wrap{
-  background-image: url('/assets/heart-patched.gif');
+  background-image: url('./assets/heart-patched.gif');
 }
 
 /* Main content */
