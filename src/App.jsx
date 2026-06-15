@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-import brokenHeart from './assets/heart-broken.gif';
-import patchedHeart from './assets/heart-patched.gif';
+
+// Use external Giphy media URLs (direct GIF links)
+const BROKEN_HEART_URL = 'https://media.giphy.com/media/8R7Tz4shvTWdof0eM9/giphy.gif';
+const PATCHED_HEART_URL = 'https://media.giphy.com/media/azi3GTPtxWKCQ/giphy.gif';
 
 // Lightweight loader that injects canvas-confetti from CDN and triggers bursts
 function loadAndRunConfetti() {
   if (typeof window === 'undefined') return;
   if (window.__confettiLoaded) {
     if (window.confetti) {
-      // two layered bursts for a nicer effect
       window.confetti({ particleCount: 160, spread: 80, origin: { y: 0.35 } });
       window.confetti({ particleCount: 120, spread: 120, origin: { y: 0.6 } });
     }
@@ -146,7 +147,8 @@ export default function App() {
       <div className="heart-particles" aria-hidden />
       <div className={`bg-heart ${heartPatched ? 'patched' : 'broken'}`}>
         <div className="heart-wrap">
-          <img src={heartPatched ? patchedHeart : brokenHeart} alt="heart" className="heart-img" />
+          {/* Use external GIF URLs via <img> */}
+          <img src={heartPatched ? PATCHED_HEART_URL : BROKEN_HEART_URL} alt="heart" className="heart-img" />
         </div>
       </div>
 
