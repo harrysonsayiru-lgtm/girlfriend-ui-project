@@ -1,161 +1,17 @@
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+/* Move Will-talk lower and add transitions */
+.btn.will-talk{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:5.5rem; /* desktop default - adjust if needed */
+  z-index:15;
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
-@keyframes move-around {
-  0%, 100% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translate(100px, -100px);
-  }
-  50% {
-    transform: translate(-150px, 100px);
-  }
-  75% {
-    transform: translate(150px, 100px);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.6s ease-out;
-}
-
-.animate-move {
-  animation: move-around 0.5s ease-in-out;
-}
-
-body {
-  margin: 0;
-  font-family: 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-#root {
-  width: 100%;
-  height: 100%;
-}
-
-/* Additional richer styles below (kept backwards compatible) */
-:root{
-  --bg-1:#fff3f6;
-  --bg-2:#fff7fb;
-  --accent-1:#ff416c; /* pink */
-  --accent-2:#ffaf7b; /* orange */
-  --muted:#f7f7f8;
-}
-
-*{box-sizing:border-box}
-body,html,#root{height:100%;margin:0}
-
-.app-root{
-  position:relative;
-  min-height:100vh;
-  overflow:hidden;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(255, 230, 240,0.9), transparent 20%), linear-gradient(180deg,var(--bg-1),var(--bg-2));
-  display:flex;align-items:center;justify-content:center;padding:24px;
-}
-
-/* Floating decorative hearts (small) */
-.heart-particles{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.heart-particles span{position:absolute;width:28px;height:28px;opacity:0.9;transform-origin:center;filter:drop-shadow(0 8px 18px rgba(0,0,0,0.12));}
-.heart-particles span::before{content:'\2764';display:block;font-size:26px;line-height:28px;color:rgba(255,70,130,0.95);text-shadow:0 1px 0 rgba(255,255,255,0.25)}
-
-/* create a subtle upward float using CSS vars assigned inline from JS */
-@keyframes floatUp{0%{transform:translateY(0) scale(0.9);opacity:0}20%{opacity:1}100%{transform:translateY(-420px) scale(1.05);opacity:0}}
-
-/* Big center heart uses the GIFs you provided (hotlinked)
-   These are Giphy media URLs derived from the links you supplied.
-*/
-.bg-heart{
-  position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;pointer-events:none;
-}
-.bg-heart .heart-wrap{width:78vmin;max-width:1100px;max-height:1100px;height:78vmin;opacity:0.85;filter:drop-shadow(0 40px 80px rgba(255,80,120,0.12));transform-origin:center;animation:heartFloat 6s ease-in-out infinite}
-
-@keyframes heartFloat{0%{transform:translateY(-10px) rotate(-1deg)}50%{transform:translateY(10px) rotate(1deg)}100%{transform:translateY(-10px) rotate(-1deg)}}
-
-/* Use the media.giphy.com direct gif URLs (hotlinks) */
-.bg-heart.broken .heart-wrap{
-  background-image: url('https://media.giphy.com/media/8R7Tz4shvTWdof0eM9/giphy.gif');
-  background-repeat:no-repeat;background-position:center;background-size:contain;
-}
-
-.bg-heart.patched .heart-wrap{
-  background-image: url('https://media.giphy.com/media/azi3GTPtxWKCQ/giphy.gif');
-  background-repeat:no-repeat;background-position:center;background-size:contain;opacity:1;}
-
-/* Main content */
-.content{position:relative;z-index:10;width:100%;max-width:980px;padding:28px 10px;color:#111}
-.title{font-weight:700;font-size:clamp(28px,7.5vw,74px);line-height:0.95;margin:2vh 0 18px;color:#071133;text-shadow:0 6px 30px rgba(255,90,120,0.06)}
-.sub{color:#6b6b7a;margin-top:8px;font-size:1.05rem}
-
-/* Buttons zone */
-.buttons-area{position:relative;height:260px;margin-top:18px}
-
-/* Will talk button - flashy */
-.btn{border-radius:999px;padding:16px 30px;border:none;font-weight:700;font-size:1.05rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
-
-.btn.will-talk{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;box-shadow:0 18px 40px rgba(255,80,140,0.18), inset 0 -2px 0 rgba(255,255,255,0.08);transform:translateZ(0);transition:transform 220ms cubic-bezier(.2,.9,.3,1),box-shadow 220ms}
-.btn.will-talk:active{transform:scale(.98)}
-.btn.will-talk:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 28px 60px rgba(255,80,140,0.2)}
-
-/* Not talk - playful and dodges */
-.btn.not-talk{background:white;color:#333;border:2px solid rgba(0,0,0,0.06);width:140px;height:52px;box-shadow:0 8px 20px rgba(16,24,40,0.06)}
-.btn.not-talk:hover{filter:brightness(1.02)}
-
-/* when moving add a small wiggle to make it look alive */
-.btn.not-talk.moving{animation:wiggle 300ms infinite}
-@keyframes wiggle{0%{transform:rotate(0deg)}25%{transform:rotate(3deg)}75%{transform:rotate(-3deg)}100%{transform:rotate(0deg)}}
-
-/* message styles */
-.message{margin-top:28px;font-size:1.25rem;color:#ff3d6e;font-weight:700}
-
-/* Fireworks / confetti area - richer: many particles */
-.fireworks{position:absolute;z-index:30;left:50%;top:28%;transform:translateX(-50%);width:640px;height:420px;pointer-events:none;overflow:visible}
-.fireworks .spark{position:absolute;width:10px;height:10px;border-radius:50%;opacity:0;transform-origin:center}
-
-/* animate multiple trajectories using nth-child */
-.fireworks .spark{background:linear-gradient(90deg,#ffd166,#ff6b6b)}
-.fireworks .spark{animation:burst 1000ms ease-out forwards}
-.fireworks .spark:nth-child(1){left:50%;top:50%;animation-delay:0ms;transform:translate(-50%,-50%)}
-.fireworks .spark:nth-child(2){left:50%;top:50%;animation-delay:60ms}
-.fireworks .spark:nth-child(3){left:50%;top:50%;animation-delay:130ms}
-.fireworks .spark:nth-child(4){left:50%;top:50%;animation-delay:200ms}
-.fireworks .spark:nth-child(5){left:50%;top:50%;animation-delay:260ms}
-.fireworks .spark:nth-child(6){left:50%;top:50%;animation-delay:320ms}
-.fireworks .spark:nth-child(7){left:50%;top:50%;animation-delay:380ms}
-.fireworks .spark:nth-child(8){left:50%;top:50%;animation-delay:420ms}
-.fireworks .spark:nth-child(9){left:50%;top:50%;animation-delay:480ms}
-.fireworks .spark:nth-child(10){left:50%;top:50%;animation-delay:540ms}
-.fireworks .spark:nth-child(11){left:50%;top:50%;animation-delay:600ms}
-.fireworks .spark:nth-child(12){left:50%;top:50%;animation-delay:660ms}
-
-@keyframes burst{
-  0%{opacity:1;transform:translate(0,0) scale(1)}
-  100%{opacity:0;transform:translate(calc(var(--dx)),calc(var(--dy))) scale(0.4)}
-}
-
-/* responsive */
 @media (max-width:640px){
-  .fireworks{width:320px;height:240px;top:30%}
-  .content{padding:18px}
-  .buttons-area{height:180px}
-  .bg-heart .heart-wrap{width:92vmin;height:92vmin}
-  .title{font-size:clamp(20px,10vw,46px)}
+  .btn.will-talk{ bottom:4rem; padding:14px 26px; font-size:1rem; }
 }
+
+/* Smooth hide/move/reveal for Not-talk button */
+.btn.not-talk{ transition: top 160ms ease, left 160ms ease, opacity 140ms ease, transform 140ms ease; will-change: top, left, opacity, transform; }
+.btn.not-talk.hidden{ opacity:0; transform:scale(0.6); pointer-events:none; }
