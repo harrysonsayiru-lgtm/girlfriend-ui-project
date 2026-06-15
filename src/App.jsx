@@ -27,7 +27,7 @@ function loadAndRunConfetti() {
 export default function App() {
   const [heartPatched, setHeartPatched] = useState(false);
   const [message, setMessage] = useState('');
-  const [notTalkPos, setNotTalkPos] = useState({ top: '55%', left: '60%' });
+  const [notTalkPos, setNotTalkPos] = useState({ top: '65%', left: '50%' });
   const [notTalkMoving, setNotTalkMoving] = useState(false);
   const [notTalkHidden, setNotTalkHidden] = useState(false);
   const [fireworks, setFireworks] = useState(false);
@@ -64,7 +64,7 @@ export default function App() {
 
   const randomPos = () => {
     const container = containerRef.current;
-    if (!container) return { top: '55%', left: '60%' };
+    if (!container) return { top: '65%', left: '50%' };
     const rect = container.getBoundingClientRect();
     const padding = 36; // keep buttons inside
     const top = Math.random() * (rect.height - padding * 2) + padding;
@@ -154,7 +154,12 @@ export default function App() {
         <h1 className="title">Ammu, will you not talk to me from now?</h1>
 
         <div className="buttons-area">
-          <button className="btn will-talk" onClick={handleWillTalk}>
+          {/* Move Will talk lower on the card so it's not centered over the heart */}
+          <button
+            className="btn will-talk"
+            onClick={handleWillTalk}
+            style={{ position: 'absolute', top: '62%', left: '35%', transform: 'translate(-50%, -50%)' }}
+          >
             Will talk
           </button>
 
